@@ -28,6 +28,8 @@ public class GraphicsDisplay extends JPanel {
     private double maxY;
     // Используемый масштаб отображения
     private double scale;
+    boolean flag;
+    private double averageY = 0;
     // Различные стили черчения линий
     private BasicStroke graphicsStroke;
     private BasicStroke axisStroke;
@@ -89,6 +91,10 @@ public class GraphicsDisplay extends JPanel {
 // Это необходимо для определения области пространства, подлежащей отображению
 
 // Еѐ верхний левый угол это (minX, maxY) - правый нижний это (maxX, minY)
+        for (int i = 0; i < graphicsData.length; i++) {
+             averageY = averageY + graphicsData[i][1];
+        }
+        averageY = averageY/graphicsData.length;
 
         minX = graphicsData[0][0];
         maxX = graphicsData[graphicsData.length - 1][0];
@@ -214,6 +220,15 @@ minY
         canvas.draw(graphics);
     }
 
+    // Специальные точки
+    protected boolean SpecialPoint(double y){
+        //раскраска маркеров по условию
+        boolean flag = false;
+        if (y > averageY * 2) flag = true;
+        else flag = false;
+        return flag;
+ }
+
     // Отображение маркеров точек, по которым рисовался график
     protected void paintMarkers(Graphics2D canvas) {
 // Шаг 1 - Установить специальное перо для черчения контуров маркеров
@@ -226,6 +241,16 @@ minY
 // Шаг 2 - Организовать цикл по всем точкам графика
         for (Double[] point : graphicsData) {
 // Инициализировать эллипс как объект для представления маркера
+            if(SpecialPoint(point[1]) == true)
+ { canvas.setColor(Color.GREEN);
+   canvas.setPaint(Color.GREEN);
+  }
+  else
+  {
+  canvas.setColor(Color.RED);
+  canvas.setPaint(Color.RED);
+ }
+
             GeneralPath marker = new GeneralPath();
             Point2D.Double center = xyToPoint(point[0], point[1]);
             marker.moveTo(center.getX(), center.getY() - 5.5);
